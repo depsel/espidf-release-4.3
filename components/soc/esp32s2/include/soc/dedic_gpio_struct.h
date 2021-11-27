@@ -31,7 +31,6 @@ typedef union {
          *  gpio.
          */
         uint32_t gpio_out_drt_vlaue: 8;
-        uint32_t reserved8: 24;
     };
     uint32_t val;
 } dedic_gpio_out_drt_reg_t;
@@ -50,7 +49,6 @@ typedef union {
          *  channel's output would be masked.
          */
         uint32_t gpio_out_msk: 8;
-        uint32_t reserved16: 16;
     };
     uint32_t val;
 } dedic_gpio_out_msk_reg_t;
@@ -100,7 +98,6 @@ typedef union {
          *  clear output value; 3: inverse output value.
          */
         uint32_t gpio_out_idv_ch7: 2;
-        uint32_t reserved16: 16;
     };
     uint32_t val;
 } dedic_gpio_out_idv_reg_t;
@@ -150,7 +147,6 @@ typedef union {
          *  select CPU instructors.
          */
         uint32_t gpio_out_cpu_sel7: 1;
-        uint32_t reserved8: 24;
     };
     uint32_t val;
 } dedic_gpio_out_cpu_reg_t;
@@ -200,7 +196,6 @@ typedef union {
          *  3: three clock delay.
          */
         uint32_t gpio_in_dly_ch7: 2;
-        uint32_t reserved16: 16;
     };
     uint32_t val;
 } dedic_gpio_in_dly_reg_t;
@@ -290,7 +285,6 @@ typedef union {
          *  6/7: falling and raising edge trigger.
          */
         uint32_t gpio_intr_mode_ch7: 3;
-        uint32_t reserved24: 8;
     };
     uint32_t val;
 } dedic_gpio_intr_rcgn_reg_t;
@@ -307,7 +301,6 @@ typedef union {
          *  DEDIC_GPIO_OUT_IDV_REG.
          */
         uint32_t gpio_out_status: 8;
-        uint32_t reserved8: 24;
     };
     uint32_t val;
 } dedic_gpio_out_scan_reg_t;
@@ -321,7 +314,6 @@ typedef union {
          *  gpio in value after configured by DEDIC_GPIO_IN_DLY_REG.
          */
         uint32_t gpio_in_status: 8;
-        uint32_t reserved8: 24;
     };
     uint32_t val;
 } dedic_gpio_in_scan_reg_t;
@@ -373,7 +365,6 @@ typedef union {
          *  change configured by DEDIC_GPIO_INTR_RCGN_REG.
          */
         uint32_t gpio7_int_raw: 1;
-        uint32_t reserved8: 24;
     };
     uint32_t val;
 } dedic_gpio_intr_raw_reg_t;
@@ -415,7 +406,6 @@ typedef union {
          *  This enable bit for reg_gpio7_int_st register.
          */
         uint32_t gpio7_int_ena: 1;
-        uint32_t reserved8: 24;
     };
     uint32_t val;
 } dedic_gpio_intr_rls_reg_t;
@@ -457,7 +447,6 @@ typedef union {
          *  This is the status bit for reg_gpio7_int_raw when reg_gpio7_int_ena is set to 1.
          */
         uint32_t gpio7_int_st: 1;
-        uint32_t reserved8: 24;
     };
     uint32_t val;
 } dedic_gpio_intr_st_reg_t;
@@ -499,7 +488,6 @@ typedef union {
          *  Set this bit to clear the reg_gpio7_int_raw interrupt.
          */
         uint32_t gpio7_int_clr: 1;
-        uint32_t reserved8: 24;
     };
     uint32_t val;
 } dedic_gpio_intr_clr_reg_t;

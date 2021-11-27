@@ -17,7 +17,7 @@
 extern "C" {
 #endif
 
-typedef volatile struct uart_dev_s {
+typedef volatile struct {
     union {
         struct {
             uint32_t rw_byte;/*note: rw_byte is a uint8_t field, however, ESP32-S2 do not support 8 bits read/write*/

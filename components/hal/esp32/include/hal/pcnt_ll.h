@@ -23,9 +23,7 @@
 #pragma once
 
 #include "soc/pcnt_periph.h"
-#include "soc/pcnt_struct.h"
 #include "hal/pcnt_types.h"
-#include "hal/hal_defs.h"
 
 #ifdef __cplusplus
 extern "C" {

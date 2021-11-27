@@ -28,10 +28,8 @@
 #include <string.h>
 
 #include "soc/spi_periph.h"
-#include "soc/spi_mem_struct.h"
 #include "hal/spi_types.h"
 #include "hal/spi_flash_types.h"
-#include "hal/hal_defs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -159,7 +157,7 @@ static inline void spimem_flash_ll_auto_resume_init(spi_mem_dev_t *dev, bool aut
  */
 static inline void spimem_flash_ll_suspend_cmd_setup(spi_mem_dev_t *dev, uint32_t sus_cmd)
 {
-    HAL_FORCE_MODIFY_U32_REG_FIELD(dev->flash_sus_cmd, flash_pes_command, sus_cmd);
+    dev->flash_sus_cmd.flash_pes_command = sus_cmd;
 }
 
 /**
@@ -171,7 +169,7 @@ static inline void spimem_flash_ll_suspend_cmd_setup(spi_mem_dev_t *dev, uint32_
  */
 static inline void spimem_flash_ll_resume_cmd_setup(spi_mem_dev_t *dev, uint32_t res_cmd)
 {
-    HAL_FORCE_MODIFY_U32_REG_FIELD(dev->flash_sus_cmd, flash_per_command, res_cmd);
+    dev->flash_sus_cmd.flash_per_command = res_cmd;
 }
 
 /**
@@ -183,7 +181,7 @@ static inline void spimem_flash_ll_resume_cmd_setup(spi_mem_dev_t *dev, uint32_t
  */
 static inline void spimem_flash_ll_rd_sus_cmd_setup(spi_mem_dev_t *dev, uint32_t pesr_cmd)
 {
-    HAL_FORCE_MODIFY_U32_REG_FIELD(dev->flash_sus_cmd, wait_pesr_command, pesr_cmd);
+    dev->flash_sus_cmd.wait_pesr_command = pesr_cmd;
 }
 
 /**
@@ -220,7 +218,7 @@ static inline void spimem_flash_ll_res_check_sus_setup(spi_mem_dev_t *dev, bool 
 static inline void spimem_flash_ll_set_read_sus_status(spi_mem_dev_t *dev, uint32_t sus_conf)
 {
     dev->flash_sus_ctrl.frd_sus_2b = 0;
-    HAL_FORCE_MODIFY_U32_REG_FIELD(dev->flash_sus_ctrl, pesr_end_msk, sus_conf);
+    dev->flash_sus_ctrl.pesr_end_msk = sus_conf;
 }
 
 /**
@@ -231,7 +229,7 @@ static inline void spimem_flash_ll_set_read_sus_status(spi_mem_dev_t *dev, uint3
  */
 static inline void spimem_flash_ll_auto_wait_idle_init(spi_mem_dev_t *dev, bool auto_waiti)
 {
-    HAL_FORCE_MODIFY_U32_REG_FIELD(dev->flash_waiti_ctrl, waiti_cmd, 0x05);
+    dev->flash_waiti_ctrl.waiti_cmd = 0x05;
     dev->flash_sus_ctrl.flash_per_wait_en = auto_waiti;
     dev->flash_sus_ctrl.flash_pes_wait_en = auto_waiti;
 }

@@ -45,7 +45,6 @@
 #include "regi2c_ctrl.h"
 #include "bootloader_console.h"
 #include "bootloader_flash_priv.h"
-#include "bootloader_soc.h"
 
 static const char *TAG = "boot.esp32c3";
 
@@ -212,7 +211,7 @@ static esp_err_t bootloader_init_spi_flash(void)
 #endif
 
     bootloader_spi_flash_resume();
-    bootloader_flash_unlock();
+    esp_rom_spiflash_unlock();
 
 #if CONFIG_ESPTOOLPY_FLASHMODE_QIO || CONFIG_ESPTOOLPY_FLASHMODE_QOUT
     bootloader_enable_qio_mode();
@@ -273,7 +272,7 @@ static inline void bootloader_hardware_init(void)
     }
 }
 
-static inline void bootloader_ana_reset_config(void)
+static inline void bootloader_glitch_reset_disable(void)
 {
     /*
       For origin chip & ECO1: only support swt reset;
@@ -281,27 +280,10 @@ static inline void bootloader_ana_reset_config(void)
       For ECO3: fix clock glitch reset bug, support all reset, include: swt & brownout & clock glitch reset.
     */
     uint8_t chip_version = bootloader_common_get_chip_revision();
-    switch (chip_version) {
-        case 0:
-        case 1:
-            //Enable WDT reset. Disable BOR and GLITCH reset
-            bootloader_ana_super_wdt_reset_config(true);
-            bootloader_ana_bod_reset_config(false);
-            bootloader_ana_clock_glitch_reset_config(false);
-            break;
-        case 2:
-            //Enable WDT and BOR reset. Disable GLITCH reset
-            bootloader_ana_super_wdt_reset_config(true);
-            bootloader_ana_bod_reset_config(true);
-            bootloader_ana_clock_glitch_reset_config(false);
-            break;
-        case 3:
-        default:
-            //Enable WDT, BOR, and GLITCH reset
-            bootloader_ana_super_wdt_reset_config(true);
-            bootloader_ana_bod_reset_config(true);
-            bootloader_ana_clock_glitch_reset_config(true);
-            break;
+    if (chip_version < 2) {
+        REG_SET_FIELD(RTC_CNTL_FIB_SEL_REG, RTC_CNTL_FIB_SEL, RTC_CNTL_FIB_SUPER_WDT_RST);
+    } else if (chip_version == 2) {
+        REG_SET_FIELD(RTC_CNTL_FIB_SEL_REG, RTC_CNTL_FIB_SEL, RTC_CNTL_FIB_SUPER_WDT_RST | RTC_CNTL_FIB_BOR_RST);
     }
 }
 
@@ -310,7 +292,7 @@ esp_err_t bootloader_init(void)
     esp_err_t ret = ESP_OK;
 
     bootloader_hardware_init();
-    bootloader_ana_reset_config();
+    bootloader_glitch_reset_disable();
     bootloader_super_wdt_auto_feed();
     // protect memory region
     bootloader_init_mem();
@@ -329,11 +311,6 @@ esp_err_t bootloader_init(void)
     bootloader_print_banner();
     // update flash ID
     bootloader_flash_update_id();
-    // Check and run XMC startup flow
-    if ((ret = bootloader_flash_xmc_startup()) != ESP_OK) {
-        ESP_LOGE(TAG, "failed when running XMC startup flow, reboot!");
-        goto err;
-    }
     // read bootloader header
     if ((ret = bootloader_read_bootloader_header()) != ESP_OK) {
         goto err;

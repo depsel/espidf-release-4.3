@@ -1,8 +1,16 @@
-/*
- * SPDX-FileCopyrightText: 2015-2021 Espressif Systems (Shanghai) CO LTD
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+// Copyright 2015-2016 Espressif Systems (Shanghai) PTE LTD
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include <string.h>
 
@@ -31,7 +39,7 @@ esp_err_t esp_ble_gattc_register_callback(esp_gattc_cb_t callback)
 
 esp_err_t esp_ble_gattc_app_register(uint16_t app_id)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -50,7 +58,7 @@ esp_err_t esp_ble_gattc_app_register(uint16_t app_id)
 
 esp_err_t esp_ble_gattc_app_unregister(esp_gatt_if_t gattc_if)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -65,7 +73,7 @@ esp_err_t esp_ble_gattc_app_unregister(esp_gatt_if_t gattc_if)
 #if (BLE_42_FEATURE_SUPPORT == TRUE)
 esp_err_t esp_ble_gattc_open(esp_gatt_if_t gattc_if, esp_bd_addr_t remote_bda, esp_ble_addr_type_t remote_addr_type, bool is_direct)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -107,7 +115,7 @@ esp_err_t esp_ble_gattc_aux_open(esp_gatt_if_t gattc_if, esp_bd_addr_t remote_bd
 
 esp_err_t esp_ble_gattc_close (esp_gatt_if_t gattc_if, uint16_t conn_id)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -122,7 +130,7 @@ esp_err_t esp_ble_gattc_close (esp_gatt_if_t gattc_if, uint16_t conn_id)
 
 esp_err_t esp_ble_gattc_send_mtu_req (esp_gatt_if_t gattc_if, uint16_t conn_id)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -137,7 +145,7 @@ esp_err_t esp_ble_gattc_send_mtu_req (esp_gatt_if_t gattc_if, uint16_t conn_id)
 
 esp_err_t esp_ble_gattc_search_service(esp_gatt_if_t gattc_if, uint16_t conn_id, esp_bt_uuid_t *filter_uuid)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -347,7 +355,7 @@ esp_err_t esp_ble_gattc_read_char (esp_gatt_if_t gattc_if,
                                    uint16_t conn_id, uint16_t handle,
                                    esp_gatt_auth_req_t auth_req)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -379,7 +387,7 @@ esp_err_t esp_ble_gattc_read_by_type (esp_gatt_if_t gattc_if,
                                       esp_bt_uuid_t *uuid,
                                       esp_gatt_auth_req_t auth_req)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -415,7 +423,7 @@ esp_err_t esp_ble_gattc_read_multiple(esp_gatt_if_t gattc_if,
                                       uint16_t conn_id, esp_gattc_multi_t *read_multi,
                                       esp_gatt_auth_req_t auth_req)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -452,7 +460,7 @@ esp_err_t esp_ble_gattc_read_char_descr (esp_gatt_if_t gattc_if,
                                          uint16_t conn_id, uint16_t handle,
                                          esp_gatt_auth_req_t auth_req)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -485,7 +493,7 @@ esp_err_t esp_ble_gattc_write_char(esp_gatt_if_t gattc_if,
                                    esp_gatt_write_type_t write_type,
                                    esp_gatt_auth_req_t auth_req)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -523,7 +531,7 @@ esp_err_t esp_ble_gattc_write_char_descr (esp_gatt_if_t gattc_if,
                                           esp_gatt_write_type_t write_type,
                                           esp_gatt_auth_req_t auth_req)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -561,7 +569,7 @@ esp_err_t esp_ble_gattc_prepare_write(esp_gatt_if_t gattc_if,
                                       uint8_t *value,
                                       esp_gatt_auth_req_t auth_req)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -597,7 +605,7 @@ esp_err_t esp_ble_gattc_prepare_write_char_descr(esp_gatt_if_t gattc_if,
                                                  uint8_t *value,
                                                  esp_gatt_auth_req_t auth_req)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -628,7 +636,7 @@ esp_err_t esp_ble_gattc_prepare_write_char_descr(esp_gatt_if_t gattc_if,
 
 esp_err_t esp_ble_gattc_execute_write (esp_gatt_if_t gattc_if, uint16_t conn_id, bool is_execute)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -645,7 +653,7 @@ esp_err_t esp_ble_gattc_execute_write (esp_gatt_if_t gattc_if, uint16_t conn_id,
 esp_err_t esp_ble_gattc_register_for_notify (esp_gatt_if_t gattc_if,
                                              esp_bd_addr_t server_bda, uint16_t handle)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -663,7 +671,7 @@ esp_err_t esp_ble_gattc_register_for_notify (esp_gatt_if_t gattc_if,
 esp_err_t esp_ble_gattc_unregister_for_notify (esp_gatt_if_t gattc_if,
                                                esp_bd_addr_t server_bda, uint16_t handle)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -679,7 +687,7 @@ esp_err_t esp_ble_gattc_unregister_for_notify (esp_gatt_if_t gattc_if,
 
 esp_err_t esp_ble_gattc_cache_refresh(esp_bd_addr_t remote_bda)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -694,7 +702,7 @@ esp_err_t esp_ble_gattc_cache_refresh(esp_bd_addr_t remote_bda)
 
 esp_err_t esp_ble_gattc_cache_clean(esp_bd_addr_t remote_bda)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -709,7 +717,7 @@ esp_err_t esp_ble_gattc_cache_clean(esp_bd_addr_t remote_bda)
 
 esp_err_t esp_ble_gattc_cache_assoc(esp_gatt_if_t gattc_if, esp_bd_addr_t src_addr, esp_bd_addr_t assoc_addr, bool is_assoc)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
@@ -727,7 +735,7 @@ esp_err_t esp_ble_gattc_cache_assoc(esp_gatt_if_t gattc_if, esp_bd_addr_t src_ad
 
 esp_err_t esp_ble_gattc_cache_get_addr_list(esp_gatt_if_t gattc_if)
 {
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     btc_ble_gattc_args_t arg;
 
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);

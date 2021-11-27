@@ -1,8 +1,6 @@
 /* Default entry point */
 ENTRY(call_start_cpu0);
 
-_diram_i_start = 0x40378000;
-
 SECTIONS
 {
   /**
@@ -185,7 +183,7 @@ SECTIONS
    */
   .dram0.dummy (NOLOAD):
   {
-    . = ORIGIN(dram0_0_seg) + MAX(_iram_end - _diram_i_start, 0);
+    . = ORIGIN(dram0_0_seg) + _iram_end - _iram_start;
   } > dram0_0_seg
 
   .dram0.data :

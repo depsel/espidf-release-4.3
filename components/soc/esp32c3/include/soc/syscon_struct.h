@@ -17,7 +17,7 @@
 extern "C" {
 #endif
 
-typedef volatile struct syscon_dev_s {
+typedef volatile struct {
     union {
         struct {
             uint32_t apb_ctrl_pre_div_cnt: 10;

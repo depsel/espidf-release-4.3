@@ -17,7 +17,7 @@
 extern "C" {
 #endif
 
-typedef volatile struct sys_timer_dev_s {
+typedef volatile struct {
     union {
         struct {
             uint32_t systimer_clk_fo:            1;       /*systimer clock force on*/

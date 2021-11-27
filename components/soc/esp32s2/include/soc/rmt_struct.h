@@ -20,7 +20,7 @@
 extern "C" {
 #endif
 
-typedef volatile struct rmt_dev_s {
+typedef volatile struct {
     uint32_t data_ch[4]; /* Data FIFO, Can only be accessed by PeriBus2 */
     struct {
         union {
@@ -299,10 +299,23 @@ typedef struct {
     };
 } rmt_item32_t;
 
+typedef struct {
+    union {
+        struct {
+            uint16_t duration :15;
+            uint16_t level :1;
+        };
+        uint16_t val;
+    };
+} rmt_item16_t;
+
 //Allow access to RMT memory using RMTMEM.chan[0].data32[8]
-typedef volatile struct rmt_mem_s {
+typedef volatile struct {
     struct {
-        rmt_item32_t data32[64];
+        union {
+            rmt_item32_t data32[64];
+            rmt_item16_t data16[128];
+        };
     } chan[4];
 } rmt_mem_t;
 extern rmt_mem_t RMTMEM;

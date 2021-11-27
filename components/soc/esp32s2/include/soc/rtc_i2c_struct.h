@@ -17,7 +17,7 @@
 extern "C" {
 #endif
 
-typedef volatile struct rtc_i2c_dev_s {
+typedef volatile struct {
     union {
         struct {
             uint32_t period:        20;             /*time period that scl = 0*/

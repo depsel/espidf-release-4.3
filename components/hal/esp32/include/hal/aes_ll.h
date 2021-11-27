@@ -1,4 +1,4 @@
-// Copyright 2020-2021 Espressif Systems (Shanghai) CO LTD
+// Copyright 2020 Espressif Systems (Shanghai) PTE LTD
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 #include "soc/hwcrypto_reg.h"
 #include "soc/dport_access.h"
 #include "hal/aes_types.h"
-#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,13 +46,10 @@ static inline uint8_t aes_ll_write_key(const uint8_t *key, size_t key_word_len)
 {
     /* This variable is used for fault injection checks, so marked volatile to avoid optimisation */
     volatile uint8_t key_bytes_in_hardware = 0;
-
-    /* Memcpy to avoid potential unaligned access */
-    uint32_t key_word;
+    uint32_t *key_words = (uint32_t *)key;
 
     for (int i = 0; i < key_word_len; i++) {
-        memcpy(&key_word, key + 4 * i, 4);
-        DPORT_REG_WRITE(AES_KEY_BASE + i * 4, key_word);
+        DPORT_REG_WRITE(AES_KEY_BASE + i * 4, *(key_words + i));
         key_bytes_in_hardware += 4;
     }
     return key_bytes_in_hardware;

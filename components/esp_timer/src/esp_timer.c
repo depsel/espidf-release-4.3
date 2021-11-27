@@ -384,7 +384,9 @@ esp_err_t esp_timer_init(void)
     }
 
 #if CONFIG_ESP_TIME_FUNCS_USE_ESP_TIMER
-    esp_timer_impl_init_system_time();
+    // [refactor-todo] this logic, "esp_rtc_get_time_us() - g_startup_time", is also
+    // the weak definition of esp_system_get_time; find a way to remove this duplication.
+    esp_timer_private_advance(esp_rtc_get_time_us() - g_startup_time);
 #endif
 
     return ESP_OK;
@@ -514,6 +516,20 @@ int64_t IRAM_ATTR esp_timer_get_next_alarm(void)
     timer_list_unlock();
     return next_alarm;
 }
+
+// Provides strong definition for system time functions relied upon
+// by core components.
+#if CONFIG_ESP_TIME_FUNCS_USE_ESP_TIMER
+int64_t IRAM_ATTR esp_system_get_time(void)
+{
+    return esp_timer_get_time();
+}
+
+uint32_t IRAM_ATTR esp_system_get_time_resolution(void)
+{
+    return 1000;
+}
+#endif
 
 bool esp_timer_is_active(esp_timer_handle_t timer)
 {

@@ -229,12 +229,11 @@ static void hci_hal_h4_hdl_rx_packet(BT_HDR *packet)
 {
     uint8_t type, hdr_size;
     uint16_t length;
-    uint8_t *stream = NULL;
+    uint8_t *stream = packet->data + packet->offset;
 
     if (!packet) {
         return;
     }
-    stream = packet->data + packet->offset;
 
 #if (C2H_FLOW_CONTROL_INCLUDED == TRUE)
     hci_packet_complete(packet);

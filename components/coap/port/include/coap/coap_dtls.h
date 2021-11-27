@@ -11,11 +11,6 @@
 #ifndef COAP_DTLS_H_
 #define COAP_DTLS_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "libcoap.h"
 #include "coap_time.h"
 #include "str.h"
 
@@ -632,8 +627,5 @@ void coap_dtls_set_log_level(int level);
  */
 int coap_dtls_get_log_level(void);
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* COAP_DTLS_H */

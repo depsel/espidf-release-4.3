@@ -190,9 +190,9 @@ ssize_t esp_mbedtls_write(esp_tls_t *tls, const char *data, size_t datalen)
                 ESP_LOGE(TAG, "write error :%d:", ret);
                 return ret;
             } else {
-                // Exiting the tls-write process as less than desired datalen are writable
+                // Exitting the tls-write process as less than desired datalen are writable
                 ESP_LOGD(TAG, "mbedtls_ssl_write() returned %d, already written %d, exitting...", ret, written);
-                return (written > 0) ? written : ret;
+                return written;
             }
         }
         written += ret;

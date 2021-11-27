@@ -26,8 +26,6 @@
 #include "esp32c3/memprot.h"
 #include "riscv/interrupt.h"
 #include "esp32c3/rom/ets_sys.h"
-#include "esp_fault.h"
-#include "soc/cpu.h"
 
 
 extern int _iram_text_end;
@@ -101,18 +99,18 @@ void *esp_memprot_get_default_main_split_addr()
 uint32_t *esp_memprot_get_split_addr(split_line_t line_type)
 {
     switch ( line_type ) {
-    case MEMPROT_IRAM0_DRAM0_SPLITLINE:
-        return memprot_ll_get_iram0_split_line_main_I_D();
-    case MEMPROT_IRAM0_LINE_0_SPLITLINE:
-        return memprot_ll_get_iram0_split_line_I_0();
-    case MEMPROT_IRAM0_LINE_1_SPLITLINE:
-        return memprot_ll_get_iram0_split_line_I_1();
-    case MEMPROT_DRAM0_DMA_LINE_0_SPLITLINE:
-        return memprot_ll_get_dram0_split_line_D_0();
-    case MEMPROT_DRAM0_DMA_LINE_1_SPLITLINE:
-        return memprot_ll_get_dram0_split_line_D_1();
-    default:
-        abort();
+        case MEMPROT_IRAM0_DRAM0_SPLITLINE:
+            return memprot_ll_get_iram0_split_line_main_I_D();
+        case MEMPROT_IRAM0_LINE_0_SPLITLINE:
+            return memprot_ll_get_iram0_split_line_I_0();
+        case MEMPROT_IRAM0_LINE_1_SPLITLINE:
+            return memprot_ll_get_iram0_split_line_I_1();
+        case MEMPROT_DRAM0_DMA_LINE_0_SPLITLINE:
+            return memprot_ll_get_dram0_split_line_D_0();
+        case MEMPROT_DRAM0_DMA_LINE_1_SPLITLINE:
+            return memprot_ll_get_dram0_split_line_D_1();
+        default:
+            abort();
     }
 }
 
@@ -399,9 +397,9 @@ pms_world_t esp_memprot_get_violate_world(mem_type_prot_t mem_type)
     }
 
     switch ( world ) {
-    case 0x01: return MEMPROT_PMS_WORLD_0;
-    case 0x10: return MEMPROT_PMS_WORLD_1;
-    default: return MEMPROT_PMS_WORLD_INVALID;
+        case 0x01: return MEMPROT_PMS_WORLD_0;
+        case 0x10: return MEMPROT_PMS_WORLD_1;
+        default: return MEMPROT_PMS_WORLD_INVALID;
     }
 }
 
@@ -471,81 +469,74 @@ void esp_memprot_set_prot(bool invoke_panic_handler, bool lock_feature, uint32_t
 
 void esp_memprot_set_prot_int(bool invoke_panic_handler, bool lock_feature, void *split_addr, uint32_t *mem_type_mask)
 {
-    //if being debugged check we are not glitched and dont enable Memprot
-    if (esp_cpu_in_ocd_debug_mode()) {
-        ESP_FAULT_ASSERT(esp_cpu_in_ocd_debug_mode());
-    } else {
-        uint32_t required_mem_prot = mem_type_mask == NULL ? (uint32_t) MEMPROT_ALL : *mem_type_mask;
-        bool use_iram0 = required_mem_prot & MEMPROT_IRAM0_SRAM;
-        bool use_dram0 = required_mem_prot & MEMPROT_DRAM0_SRAM;
+    uint32_t required_mem_prot = mem_type_mask == NULL ? (uint32_t)MEMPROT_ALL : *mem_type_mask;
+    bool use_iram0 = required_mem_prot & MEMPROT_IRAM0_SRAM;
+    bool use_dram0 = required_mem_prot & MEMPROT_DRAM0_SRAM;
 
-        if (required_mem_prot == MEMPROT_NONE) {
-            return;
-        }
+    if (required_mem_prot == MEMPROT_NONE) {
+        return;
+    }
 
-        //disable protection
+    //disable protection
+    if (use_iram0) {
+        esp_memprot_set_monitor_en(MEMPROT_IRAM0_SRAM, false);
+    }
+    if (use_dram0) {
+        esp_memprot_set_monitor_en(MEMPROT_DRAM0_SRAM, false);
+    }
+
+    //panic handling
+    if (invoke_panic_handler) {
         if (use_iram0) {
-            esp_memprot_set_monitor_en(MEMPROT_IRAM0_SRAM, false);
+            esp_memprot_set_intr_matrix(MEMPROT_IRAM0_SRAM);
         }
         if (use_dram0) {
-            esp_memprot_set_monitor_en(MEMPROT_DRAM0_SRAM, false);
+            esp_memprot_set_intr_matrix(MEMPROT_DRAM0_SRAM);
         }
+    }
 
-        //panic handling
-        if (invoke_panic_handler) {
-            if (use_iram0) {
-                esp_memprot_set_intr_matrix(MEMPROT_IRAM0_SRAM);
-            }
-            if (use_dram0) {
-                esp_memprot_set_intr_matrix(MEMPROT_DRAM0_SRAM);
-            }
-        }
+    //set split lines (must-have for all mem_types)
+    const void *line_addr = split_addr == NULL ? esp_memprot_get_default_main_split_addr() : split_addr;
+    esp_memprot_set_split_line(MEMPROT_IRAM0_LINE_1_SPLITLINE, line_addr);
+    esp_memprot_set_split_line(MEMPROT_IRAM0_LINE_0_SPLITLINE, line_addr);
+    esp_memprot_set_split_line(MEMPROT_IRAM0_DRAM0_SPLITLINE, line_addr);
+    esp_memprot_set_split_line(MEMPROT_DRAM0_DMA_LINE_0_SPLITLINE, (void *)(MAP_IRAM_TO_DRAM((uint32_t)line_addr)));
+    esp_memprot_set_split_line(MEMPROT_DRAM0_DMA_LINE_1_SPLITLINE, (void *)(MAP_IRAM_TO_DRAM((uint32_t)line_addr)));
 
-        //set split lines (must-have for all mem_types)
-        const void *line_addr = split_addr == NULL ? esp_memprot_get_default_main_split_addr() : split_addr;
-        esp_memprot_set_split_line(MEMPROT_IRAM0_LINE_1_SPLITLINE, line_addr);
-        esp_memprot_set_split_line(MEMPROT_IRAM0_LINE_0_SPLITLINE, line_addr);
-        esp_memprot_set_split_line(MEMPROT_IRAM0_DRAM0_SPLITLINE, line_addr);
-        esp_memprot_set_split_line(MEMPROT_DRAM0_DMA_LINE_0_SPLITLINE,
-                                   (void *) (MAP_IRAM_TO_DRAM((uint32_t) line_addr)));
-        esp_memprot_set_split_line(MEMPROT_DRAM0_DMA_LINE_1_SPLITLINE,
-                                   (void *) (MAP_IRAM_TO_DRAM((uint32_t) line_addr)));
+    //set permissions
+    if (required_mem_prot & MEMPROT_IRAM0_SRAM) {
+        esp_memprot_iram_set_pms_area(MEMPROT_IRAM0_PMS_AREA_0, true, false, true);
+        esp_memprot_iram_set_pms_area(MEMPROT_IRAM0_PMS_AREA_1, true, false, true);
+        esp_memprot_iram_set_pms_area(MEMPROT_IRAM0_PMS_AREA_2, true, false, true);
+        esp_memprot_iram_set_pms_area(MEMPROT_IRAM0_PMS_AREA_3, true, true, false);
+    }
+    if (required_mem_prot & MEMPROT_DRAM0_SRAM) {
+        esp_memprot_dram_set_pms_area( MEMPROT_DRAM0_PMS_AREA_0, true, false );
+        esp_memprot_dram_set_pms_area(MEMPROT_DRAM0_PMS_AREA_1, true, true);
+        esp_memprot_dram_set_pms_area(MEMPROT_DRAM0_PMS_AREA_2, true, true);
+        esp_memprot_dram_set_pms_area(MEMPROT_DRAM0_PMS_AREA_3, true, true);
+    }
 
-        //set permissions
-        if (required_mem_prot & MEMPROT_IRAM0_SRAM) {
-            esp_memprot_iram_set_pms_area(MEMPROT_IRAM0_PMS_AREA_0, true, false, true);
-            esp_memprot_iram_set_pms_area(MEMPROT_IRAM0_PMS_AREA_1, true, false, true);
-            esp_memprot_iram_set_pms_area(MEMPROT_IRAM0_PMS_AREA_2, true, false, true);
-            esp_memprot_iram_set_pms_area(MEMPROT_IRAM0_PMS_AREA_3, true, true, false);
-        }
-        if (required_mem_prot & MEMPROT_DRAM0_SRAM) {
-            esp_memprot_dram_set_pms_area(MEMPROT_DRAM0_PMS_AREA_0, true, false);
-            esp_memprot_dram_set_pms_area(MEMPROT_DRAM0_PMS_AREA_1, true, true);
-            esp_memprot_dram_set_pms_area(MEMPROT_DRAM0_PMS_AREA_2, true, true);
-            esp_memprot_dram_set_pms_area(MEMPROT_DRAM0_PMS_AREA_3, true, true);
-        }
+    //reenable protection
+    if (use_iram0) {
+        esp_memprot_monitor_clear_intr(MEMPROT_IRAM0_SRAM);
+        esp_memprot_set_monitor_en(MEMPROT_IRAM0_SRAM, true);
+    }
+    if (use_dram0) {
+        esp_memprot_monitor_clear_intr(MEMPROT_DRAM0_SRAM);
+        esp_memprot_set_monitor_en(MEMPROT_DRAM0_SRAM, true);
+    }
 
-        //reenable protection
+    //lock if required
+    if (lock_feature) {
+        esp_memprot_set_split_line_lock();
         if (use_iram0) {
-            esp_memprot_monitor_clear_intr(MEMPROT_IRAM0_SRAM);
-            esp_memprot_set_monitor_en(MEMPROT_IRAM0_SRAM, true);
+            esp_memprot_set_pms_lock(MEMPROT_IRAM0_SRAM);
+            esp_memprot_set_monitor_lock(MEMPROT_IRAM0_SRAM);
         }
         if (use_dram0) {
-            esp_memprot_monitor_clear_intr(MEMPROT_DRAM0_SRAM);
-            esp_memprot_set_monitor_en(MEMPROT_DRAM0_SRAM, true);
-        }
-
-        //lock if required
-        if (lock_feature) {
-            esp_memprot_set_split_line_lock();
-            if (use_iram0) {
-                esp_memprot_set_pms_lock(MEMPROT_IRAM0_SRAM);
-                esp_memprot_set_monitor_lock(MEMPROT_IRAM0_SRAM);
-            }
-            if (use_dram0) {
-                esp_memprot_set_pms_lock(MEMPROT_DRAM0_SRAM);
-                esp_memprot_set_monitor_lock(MEMPROT_DRAM0_SRAM);
-            }
+            esp_memprot_set_pms_lock(MEMPROT_DRAM0_SRAM);
+            esp_memprot_set_monitor_lock(MEMPROT_DRAM0_SRAM);
         }
     }
 }

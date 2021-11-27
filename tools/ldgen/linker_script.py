@@ -66,6 +66,8 @@ class LinkerScript:
                 target = member.target
                 rules = member.rules
 
+                del rules[:]
+
                 rules.extend(mapping_rules[target])
             except KeyError:
                 message = GenerationException.UNDEFINED_REFERENCE + " to target '" + target + "'."

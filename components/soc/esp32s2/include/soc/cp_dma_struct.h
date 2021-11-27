@@ -69,7 +69,6 @@ typedef union {
          *  This is the interrupt raw bit. Triggered when crc calculation is done.
          */
         uint32_t dma_crc_done_int_raw: 1;
-        uint32_t reserved9: 23;
     };
     uint32_t val;
 } cp_dma_int_raw_reg_t;
@@ -124,7 +123,6 @@ typedef union {
          *  cp_crc_done_int_ena is set to 1.
          */
         uint32_t dma_crc_done_int_st: 1;
-        uint32_t reserved9: 23;
     };
     uint32_t val;
 } cp_dma_int_st_reg_t;
@@ -170,7 +168,6 @@ typedef union {
          *  This is the interrupt enable bit for cp_crc_done_int interrupt.
          */
         uint32_t dma_crc_done_int_ena: 1;
-        uint32_t reserved9: 23;
     };
     uint32_t val;
 } cp_dma_int_ena_reg_t;
@@ -216,7 +213,6 @@ typedef union {
          *  Set this bit to clear cp_crc_done_int interrupt.
          */
         uint32_t dma_crc_done_int_clr: 1;
-        uint32_t reserved9: 23;
     };
     uint32_t val;
 } cp_dma_int_clr_reg_t;
@@ -495,7 +491,6 @@ typedef union {
          *  Copy DMA FIFO empty signal.
          */
         uint32_t dma_fifo_empty: 1;
-        uint32_t reserved24: 8;
     };
     uint32_t val;
 } cp_dma_in_st_reg_t;
@@ -521,7 +516,6 @@ typedef union {
          *  Copy DMA FIFO full signal.
          */
         uint32_t dma_fifo_full: 1;
-        uint32_t reserved24: 8;
     };
     uint32_t val;
 } cp_dma_out_st_reg_t;

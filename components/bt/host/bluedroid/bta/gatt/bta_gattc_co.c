@@ -154,10 +154,6 @@ static void cacheReset(BD_ADDR bda)
             cache_env->cache_addr[index].is_open = FALSE;
         } else {
             cacheOpen(bda, false, &index);
-            if (index == INVALID_ADDR_NUM) {
-                APPL_TRACE_ERROR("%s INVALID ADDR NUM", __func__);
-                return;
-            }
             if (cache_env->cache_addr[index].is_open) {
                 nvs_erase_all(cache_env->cache_addr[index].cache_fp);
                 nvs_close(cache_env->cache_addr[index].cache_fp);

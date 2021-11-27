@@ -671,13 +671,12 @@ esp_err_t mbc_serial_master_create(void** handler)
     MB_MASTER_CHECK((mbm_opts->mbm_event_group != NULL),
                         ESP_ERR_NO_MEM, "mb event group error.");
     // Create modbus controller task
-    status = xTaskCreatePinnedToCore((void*)&modbus_master_task,
+    status = xTaskCreate((void*)&modbus_master_task,
                             "modbus_matask",
                             MB_CONTROLLER_STACK_SIZE,
                             NULL,                       // No parameters
                             MB_CONTROLLER_PRIORITY,
-                            &mbm_opts->mbm_task_handle,
-                            MB_PORT_TASK_AFFINITY);
+                            &mbm_opts->mbm_task_handle);
     if (status != pdPASS) {
         vTaskDelete(mbm_opts->mbm_task_handle);
         MB_MASTER_CHECK((status == pdPASS), ESP_ERR_NO_MEM,

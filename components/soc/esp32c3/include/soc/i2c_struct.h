@@ -20,7 +20,7 @@ extern "C" {
 #endif
 #include "soc.h"
 
-typedef volatile struct i2c_dev_s {
+typedef volatile struct {
     union {
         struct {
             uint32_t period                        :    9;

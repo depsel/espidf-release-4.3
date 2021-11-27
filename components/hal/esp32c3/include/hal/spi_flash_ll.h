@@ -24,7 +24,6 @@
 
 #include "gpspi_flash_ll.h"
 #include "spimem_flash_ll.h"
-#include "hal/hal_defs.h"
 
 #ifdef __cplusplus
 extern "C" {

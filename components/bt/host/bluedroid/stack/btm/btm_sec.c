@@ -1150,7 +1150,7 @@ tBTM_STATUS BTM_SecBondByTransport (BD_ADDR bd_addr, tBT_TRANSPORT transport,
 {
 #if (BLE_INCLUDED == TRUE)
     tBT_DEVICE_TYPE     dev_type;
-    tBLE_ADDR_TYPE      addr_type = 0;
+    tBLE_ADDR_TYPE      addr_type;
 
     BTM_ReadDevInfo(bd_addr, &dev_type, &addr_type);
     /* LE device, do SMP pairing */
@@ -1527,8 +1527,8 @@ void BTM_ConfirmReqReply(tBTM_STATUS res, BD_ADDR bd_addr)
         if (res == BTM_SUCCESS) {
             if ((p_dev_rec = btm_find_dev (bd_addr)) != NULL) {
                 p_dev_rec->sec_flags |= BTM_SEC_LINK_KEY_AUTHED;
-                p_dev_rec->sec_flags |= BTM_SEC_16_DIGIT_PIN_AUTHED;
             }
+            p_dev_rec->sec_flags |= BTM_SEC_16_DIGIT_PIN_AUTHED;
         }
 
         btsnd_hcic_user_conf_reply (bd_addr, TRUE);
@@ -2981,7 +2981,6 @@ void btm_sec_rmt_name_request_complete (UINT8 *p_bd_addr, UINT8 *p_bd_name, UINT
     int              i;
     DEV_CLASS        dev_class;
     UINT8            old_sec_state;
-    UINT8            res;
 
     BTM_TRACE_EVENT ("btm_sec_rmt_name_request_complete\n");
     if (((p_bd_addr == NULL) && !BTM_ACL_IS_CONNECTED(btm_cb.connecting_bda))
@@ -3162,12 +3161,9 @@ void btm_sec_rmt_name_request_complete (UINT8 *p_bd_addr, UINT8 *p_bd_name, UINT
         /* This is required when different entities receive link notification and auth complete */
         if (!(p_dev_rec->security_required & BTM_SEC_OUT_AUTHENTICATE)) {
             if (btm_cb.api.p_auth_complete_callback) {
-                res = (*btm_cb.api.p_auth_complete_callback) (p_dev_rec->bd_addr,
-                                                              p_dev_rec->dev_class,
-                                                              p_dev_rec->sec_bd_name, HCI_SUCCESS);
-                if (res == BTM_SEC_DEV_REC_REMOVED) {
-                    p_dev_rec = NULL;
-                }
+                (*btm_cb.api.p_auth_complete_callback) (p_dev_rec->bd_addr,
+                                                        p_dev_rec->dev_class,
+                                                        p_dev_rec->sec_bd_name, HCI_SUCCESS);
             }
 
         }
@@ -3857,7 +3853,6 @@ static void btm_sec_auth_collision (UINT16 handle)
 #if (SMP_INCLUDED == TRUE)
 void btm_sec_auth_complete (UINT16 handle, UINT8 status)
 {
-    UINT8 res;
     UINT8            old_sm4;
     tBTM_PAIRING_STATE  old_state   = btm_cb.pairing_state;
     tBTM_SEC_DEV_REC *p_dev_rec = btm_find_dev_by_handle (handle);
@@ -3947,12 +3942,9 @@ void btm_sec_auth_complete (UINT16 handle, UINT8 status)
     if (btm_cb.api.p_auth_complete_callback) {
         /* report the authentication status */
         if (old_state != BTM_PAIR_STATE_IDLE) {
-            res = (*btm_cb.api.p_auth_complete_callback) (p_dev_rec->bd_addr,
-                                                          p_dev_rec->dev_class,
-                                                          p_dev_rec->sec_bd_name, status);
-            if (res == BTM_SEC_DEV_REC_REMOVED) {
-                p_dev_rec = NULL;
-            }
+            (*btm_cb.api.p_auth_complete_callback) (p_dev_rec->bd_addr,
+                                                    p_dev_rec->dev_class,
+                                                    p_dev_rec->sec_bd_name, status);
         }
     }
 
@@ -4249,7 +4241,6 @@ void btm_sec_connected (UINT8 *bda, UINT16 handle, UINT8 status, UINT8 enc_mode)
 {
     tBTM_SEC_DEV_REC *p_dev_rec = btm_find_dev (bda);
     UINT8            res;
-    UINT8            sec_dev_rec_status;
     BOOLEAN          is_pairing_device = FALSE;
     tACL_CONN        *p_acl_cb;
     UINT8            bit_shift = 0;
@@ -4388,12 +4379,9 @@ void btm_sec_connected (UINT8 *bda, UINT16 handle, UINT8 status, UINT8 enc_mode)
 
             /* We need to notify host that the key is not known any more */
             if (btm_cb.api.p_auth_complete_callback) {
-                sec_dev_rec_status = (*btm_cb.api.p_auth_complete_callback) (p_dev_rec->bd_addr,
-                                                                             p_dev_rec->dev_class,
-                                                                             p_dev_rec->sec_bd_name, status);
-                if (sec_dev_rec_status == BTM_SEC_DEV_REC_REMOVED) {
-                    p_dev_rec = NULL;
-                }
+                (*btm_cb.api.p_auth_complete_callback) (p_dev_rec->bd_addr,
+                                                        p_dev_rec->dev_class,
+                                                        p_dev_rec->sec_bd_name, status);
             }
         }
         /*
@@ -4424,12 +4412,9 @@ void btm_sec_connected (UINT8 *bda, UINT16 handle, UINT8 status, UINT8 enc_mode)
 
             /* We need to notify host that the key is not known any more */
             if (btm_cb.api.p_auth_complete_callback) {
-                sec_dev_rec_status = (*btm_cb.api.p_auth_complete_callback) (p_dev_rec->bd_addr,
-                                                                             p_dev_rec->dev_class,
-                                                                             p_dev_rec->sec_bd_name, status);
-                if (sec_dev_rec_status == BTM_SEC_DEV_REC_REMOVED) {
-                    p_dev_rec = NULL;
-                }
+                (*btm_cb.api.p_auth_complete_callback) (p_dev_rec->bd_addr,
+                                                        p_dev_rec->dev_class,
+                                                        p_dev_rec->sec_bd_name, status);
             }
         }
 
@@ -4462,12 +4447,9 @@ void btm_sec_connected (UINT8 *bda, UINT16 handle, UINT8 status, UINT8 enc_mode)
         }
 
         if (btm_cb.api.p_auth_complete_callback) {
-            sec_dev_rec_status = (*btm_cb.api.p_auth_complete_callback) (p_dev_rec->bd_addr,
-                                                                         p_dev_rec->dev_class,
-                                                                         p_dev_rec->sec_bd_name, HCI_SUCCESS);
-            if (sec_dev_rec_status == BTM_SEC_DEV_REC_REMOVED) {
-                p_dev_rec = NULL;
-            }
+            (*btm_cb.api.p_auth_complete_callback) (p_dev_rec->bd_addr,
+                                                    p_dev_rec->dev_class,
+                                                    p_dev_rec->sec_bd_name, HCI_SUCCESS);
         }
 
         btm_sec_change_pairing_state (BTM_PAIR_STATE_IDLE);
@@ -4686,7 +4668,6 @@ void btm_sec_link_key_notification (UINT8 *p_bda, UINT8 *p_link_key, UINT8 key_t
     tBTM_SEC_DEV_REC *p_dev_rec = btm_find_or_alloc_dev (p_bda);
     BOOLEAN         we_are_bonding = FALSE;
     BOOLEAN         ltk_derived_lk  = FALSE;
-    UINT8           res;
 
     BTM_TRACE_EVENT ("btm_sec_link_key_notification()  BDA:%04x%08x, TYPE: %d\n",
                      (p_bda[0] << 8) + p_bda[1], (p_bda[2] << 24) + (p_bda[3] << 16) + (p_bda[4] << 8) + p_bda[5],
@@ -4791,11 +4772,8 @@ void btm_sec_link_key_notification (UINT8 *p_bda, UINT8 *p_link_key, UINT8 key_t
             /* for derived key, always send authentication callback for BR channel */
             || ltk_derived_lk) {
         if (btm_cb.api.p_auth_complete_callback) {
-            res = (*btm_cb.api.p_auth_complete_callback) (p_dev_rec->bd_addr, p_dev_rec->dev_class,
-                                                          p_dev_rec->sec_bd_name, HCI_SUCCESS);
-            if (res == BTM_SEC_DEV_REC_REMOVED) {
-                p_dev_rec = NULL;
-            }
+            (*btm_cb.api.p_auth_complete_callback) (p_dev_rec->bd_addr, p_dev_rec->dev_class,
+                                                    p_dev_rec->sec_bd_name, HCI_SUCCESS);
         }
     }
 
@@ -5782,10 +5760,9 @@ static char *btm_pair_state_descr (tBTM_PAIRING_STATE state)
 *******************************************************************************/
 void btm_sec_dev_rec_cback_event (tBTM_SEC_DEV_REC *p_dev_rec, UINT8 res, BOOLEAN is_le_transport)
 {
-    tBTM_SEC_CALLBACK   *p_callback;
+    tBTM_SEC_CALLBACK   *p_callback = p_dev_rec->p_callback;
 
-    if (p_dev_rec && p_dev_rec->p_callback) {
-        p_callback = p_dev_rec->p_callback;
+    if (p_dev_rec->p_callback) {
         p_dev_rec->p_callback = NULL;
 
 #if BLE_INCLUDED == TRUE

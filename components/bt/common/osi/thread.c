@@ -110,6 +110,7 @@ static void osi_thread_stop(osi_thread_t *thread)
 osi_thread_t *osi_thread_create(const char *name, size_t stack_size, int priority, osi_thread_core_t core, uint8_t work_queue_num)
 {
     int ret;
+    osi_thread_t *thread;
     struct osi_thread_start_arg start_arg = {0};
 
     if (stack_size <= 0 ||
@@ -118,7 +119,7 @@ osi_thread_t *osi_thread_create(const char *name, size_t stack_size, int priorit
         return NULL;
     }
 
-    osi_thread_t *thread = (osi_thread_t *)osi_malloc(sizeof(osi_thread_t));
+    thread = (osi_thread_t *)osi_malloc(sizeof(osi_thread_t));
     if (thread == NULL) {
         goto _err;
     }

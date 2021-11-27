@@ -28,8 +28,6 @@
 #include "mbc_tcp_slave.h"          // for tcp slave mb controller defines
 #include "port_tcp_slave.h"         // for tcp slave port defines
 
-#if MB_TCP_ENABLED
-
 // Shared pointer to interface structure
 static mb_slave_interface_t* mbs_interface_ptr = NULL;
 
@@ -187,13 +185,12 @@ esp_err_t mbc_tcp_slave_create(void** handler)
     MB_SLAVE_CHECK((mbs_opts->mbs_notification_queue_handle != NULL),
             ESP_ERR_NO_MEM, "mb notify queue creation error.");
     // Create Modbus controller task
-    status = xTaskCreatePinnedToCore((void*)&modbus_tcp_slave_task,
+    status = xTaskCreate((void*)&modbus_tcp_slave_task,
                             "modbus_tcp_slave_task",
                             MB_CONTROLLER_STACK_SIZE,
                             NULL,
                             MB_CONTROLLER_PRIORITY,
-                            &mbs_opts->mbs_task_handle,
-                            MB_PORT_TASK_AFFINITY);
+                            &mbs_opts->mbs_task_handle);
     if (status != pdPASS) {
         vTaskDelete(mbs_opts->mbs_task_handle);
         MB_SLAVE_CHECK((status == pdPASS), ESP_ERR_NO_MEM,
@@ -223,5 +220,3 @@ esp_err_t mbc_tcp_slave_create(void** handler)
 
     return ESP_OK;
 }
-
-#endif //#if MB_TCP_ENABLED

@@ -20,7 +20,7 @@ extern "C" {
 #endif
 #include "soc.h"
 
-typedef volatile struct system_dev_s {
+typedef volatile struct {
     union {
         struct {
             uint32_t reserved0                     :    6;  /*reserved*/

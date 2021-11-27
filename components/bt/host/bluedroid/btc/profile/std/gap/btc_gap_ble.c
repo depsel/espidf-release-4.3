@@ -1,8 +1,16 @@
-/*
- * SPDX-FileCopyrightText: 2015-2021 Espressif Systems (Shanghai) CO LTD
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+// Copyright 2015-2016 Espressif Systems (Shanghai) PTE LTD
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include <string.h>
 
@@ -205,8 +213,8 @@ static void btc_to_bta_adv_data(esp_ble_adv_data_t *p_adv_data, tBTA_BLE_ADV_DAT
             if (NULL != p_elem) {
                 memcpy(p_elem++, p_elem_service_data, sizeof(tBTA_BLE_PROP_ELEM));
             }
+            osi_free(p_elem_service_data);
         }
-        osi_free(p_elem_service_data);
     }
 
     if (p_adv_data->service_uuid_len && p_adv_data->p_service_uuid) {
@@ -291,7 +299,7 @@ static void btc_adv_data_callback(tBTA_STATUS status)
 {
     esp_ble_gap_cb_param_t param;
     bt_status_t ret;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
 
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
@@ -310,7 +318,7 @@ static void btc_scan_rsp_data_callback(tBTA_STATUS status)
 {
     esp_ble_gap_cb_param_t param;
     bt_status_t ret;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
 
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
@@ -329,7 +337,7 @@ static void btc_adv_data_raw_callback(tBTA_STATUS status)
 {
     esp_ble_gap_cb_param_t param;
     bt_status_t ret;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
 
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
@@ -348,7 +356,7 @@ static void btc_scan_rsp_data_raw_callback(tBTA_STATUS status)
 {
     esp_ble_gap_cb_param_t param;
     bt_status_t ret;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
 
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
@@ -393,7 +401,7 @@ static void btc_start_adv_callback(uint8_t status)
 {
     esp_ble_gap_cb_param_t param;
     bt_status_t ret;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
 
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
@@ -412,7 +420,7 @@ static void btc_stop_adv_callback(uint8_t status)
 {
     esp_ble_gap_cb_param_t param;
     bt_status_t ret;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
 
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
@@ -431,7 +439,7 @@ void btc_update_duplicate_exceptional_list_callback(tBTA_STATUS status, uint8_t 
 {
     esp_ble_gap_cb_param_t param;
     bt_status_t ret;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
 
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
@@ -512,7 +520,7 @@ static void btc_scan_params_callback(tGATT_IF gatt_if, tBTM_STATUS status)
 {
     esp_ble_gap_cb_param_t param;
     bt_status_t ret;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
 
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
@@ -551,7 +559,7 @@ static void btc_ble_set_scan_params(esp_ble_scan_params_t *scan_params, tBLE_SCA
 static void btc_search_callback(tBTA_DM_SEARCH_EVT event, tBTA_DM_SEARCH *p_data)
 {
     esp_ble_gap_cb_param_t param;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
 
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
@@ -619,7 +627,7 @@ static void btc_start_scan_callback(uint8_t status)
 {
     esp_ble_gap_cb_param_t param;
     bt_status_t ret;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
 
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
@@ -638,7 +646,7 @@ static void btc_stop_scan_callback(tBTA_STATUS status)
 {
     esp_ble_gap_cb_param_t param;
     bt_status_t ret;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
 
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
@@ -660,7 +668,7 @@ void btc_update_conn_param_callback (UINT8 status, BD_ADDR bd_addr, tBTM_LE_UPDA
 {
     esp_ble_gap_cb_param_t param;
     bt_status_t ret;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
     msg.act = ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT;
@@ -683,7 +691,7 @@ static void btc_set_pkt_length_callback(UINT8 status, tBTM_LE_SET_PKT_DATA_LENGT
 {
     esp_ble_gap_cb_param_t param;
     bt_status_t ret;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
     msg.act = ESP_GAP_BLE_SET_PKT_LENGTH_COMPLETE_EVT;
@@ -703,7 +711,7 @@ static void btc_gap_ble_set_channels_cmpl_callback(void *p_data)
     tBTA_BLE_SET_CHANNELS_RESULTS *result = (tBTA_BLE_SET_CHANNELS_RESULTS *)p_data;
     esp_ble_gap_cb_param_t param;
     bt_status_t ret;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
     msg.act = ESP_GAP_BLE_SET_CHANNELS_EVT;
@@ -723,7 +731,7 @@ static void btc_add_whitelist_complete_callback(UINT8 status, tBTM_WL_OPERATION 
 {
     esp_ble_gap_cb_param_t param;
     bt_status_t ret;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
     msg.act = ESP_GAP_BLE_UPDATE_WHITELIST_COMPLETE_EVT;
@@ -741,7 +749,7 @@ static void btc_set_rand_addr_callback(UINT8 status)
 {
     esp_ble_gap_cb_param_t param;
     bt_status_t ret;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     param.set_rand_addr_cmpl.status = btc_btm_status_to_esp_status(status); //todo status
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
@@ -759,7 +767,7 @@ static void btc_set_local_privacy_callback(UINT8 status)
 {
     esp_ble_gap_cb_param_t param;
     bt_status_t ret;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
     msg.act = ESP_GAP_BLE_SET_LOCAL_PRIVACY_COMPLETE_EVT;
@@ -788,7 +796,7 @@ static void btc_read_ble_rssi_cmpl_callback(void *p_data)
     tBTA_RSSI_RESULTS *result = (tBTA_RSSI_RESULTS *)p_data;
     esp_ble_gap_cb_param_t param;
     bt_status_t ret;
-    btc_msg_t msg = {0};
+    btc_msg_t msg;
     msg.sig = BTC_SIG_API_CB;
     msg.pid = BTC_PID_GAP_BLE;
     msg.act = ESP_GAP_BLE_READ_RSSI_COMPLETE_EVT;

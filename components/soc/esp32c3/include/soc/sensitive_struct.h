@@ -20,7 +20,7 @@ extern "C" {
 #endif
 #include "soc.h"
 
-typedef volatile struct sensitive_dev_s {
+typedef volatile struct {
     union {
         struct {
             uint32_t reg_rom_table_lock            :    1;  /*rom_table_lock*/
@@ -960,9 +960,10 @@ typedef volatile struct sensitive_dev_s {
         struct {
             uint32_t reg_clk_en                    :    1;  /*clk_en*/
             uint32_t reserved1                     :    31;
+            uint32_t reservedNone                  :    None;  /*SENSITIVE_CLOCK_GATE_REG_REG*/
         };
         uint32_t val;
-    } clock_gate;   /*SENSITIVE_CLOCK_GATE_REG_REG*/
+    } clock_gate;
     uint32_t reserved_174;
     uint32_t reserved_178;
     uint32_t reserved_17c;

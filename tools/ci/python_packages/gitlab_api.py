@@ -3,45 +3,10 @@ import os
 import re
 import tarfile
 import tempfile
-import time
 import zipfile
 from functools import wraps
 
 import gitlab
-
-try:
-    from typing import Any, Callable, Dict, List, Optional
-    TR = Callable[..., Any]
-except ImportError:
-    pass
-
-
-def retry(func):  # type: (TR) -> TR
-    """
-    This wrapper will only catch several exception types associated with
-    "network issues" and retry the whole function.
-    """
-    @wraps(func)
-    def wrapper(self, *args, **kwargs):  # type: (Gitlab, Any, Any) -> Any
-        retried = 0
-        while True:
-            try:
-                res = func(self, *args, **kwargs)
-            except (IOError, EOFError, gitlab.exceptions.GitlabError) as e:
-                if isinstance(e, gitlab.exceptions.GitlabError) and e.response_code != 500:
-                    # Only retry on error 500
-                    raise e
-                retried += 1
-                if retried > self.DOWNLOAD_ERROR_MAX_RETRIES:
-                    raise e  # get out of the loop
-                else:
-                    print('Network failure in {}, retrying ({})'.format(getattr(func, '__name__', '(unknown callable)'), retried))
-                    time.sleep(2 ** retried)  # wait a bit more after each retry
-                    continue
-            else:
-                break
-        return res
-    return wrapper
 
 
 class Gitlab(object):
@@ -49,20 +14,16 @@ class Gitlab(object):
 
     DOWNLOAD_ERROR_MAX_RETRIES = 3
 
-    def __init__(self, project_id=None):  # type: (Optional[int]) -> None
+    def __init__(self, project_id=None):
         config_data_from_env = os.getenv('PYTHON_GITLAB_CONFIG')
         if config_data_from_env:
             # prefer to load config from env variable
             with tempfile.NamedTemporaryFile('w', delete=False) as temp_file:
                 temp_file.write(config_data_from_env)
-            config_files = [temp_file.name]  # type: Optional[List[str]]
+            config_files = [temp_file.name]
         else:
             # otherwise try to use config file at local filesystem
             config_files = None
-        self._init_gitlab_inst(project_id, config_files)
-
-    @retry
-    def _init_gitlab_inst(self, project_id, config_files):  # type: (Optional[int], Optional[List[str]]) -> None
         gitlab_id = os.getenv('LOCAL_GITLAB_HTTPS_HOST')  # if None, will use the default gitlab server
         self.gitlab_inst = gitlab.Gitlab.from_config(gitlab_id=gitlab_id, config_files=config_files)
         self.gitlab_inst.auth()
@@ -71,8 +32,7 @@ class Gitlab(object):
         else:
             self.project = None
 
-    @retry
-    def get_project_id(self, name, namespace=None):  # type: (str, Optional[str]) -> int
+    def get_project_id(self, name, namespace=None):
         """
         search project ID by name
 
@@ -96,10 +56,9 @@ class Gitlab(object):
 
         if not res:
             raise ValueError("Can't find project")
-        return int(res[0])
+        return res[0]
 
-    @retry
-    def download_artifacts(self, job_id, destination):  # type (int, str) -> None
+    def download_artifacts(self, job_id, destination):
         """
         download full job artifacts and extract to destination.
 
@@ -114,8 +73,32 @@ class Gitlab(object):
         with zipfile.ZipFile(temp_file.name, 'r') as archive_file:
             archive_file.extractall(destination)
 
-    @retry
-    def download_artifact(self, job_id, artifact_path, destination=None):  # type: (int, str, Optional[str]) -> List[bytes]
+    def retry_download(func):
+        """
+        This wrapper will only catch IOError and retry the whole function.
+
+        So only use it with download functions, read() inside and atomic
+        functions
+        """
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            retried = 0
+            while True:
+                try:
+                    res = func(self, *args, **kwargs)
+                except (IOError, EOFError) as e:
+                    retried += 1
+                    if retried > self.DOWNLOAD_ERROR_MAX_RETRIES:
+                        raise e  # get out of the loop
+                    else:
+                        print('Retried for the {} time'.format(retried))
+                        continue
+                else:
+                    break
+            return res
+        return wrapper
+
+    def download_artifact(self, job_id, artifact_path, destination=None):
         """
         download specific path of job artifacts and extract to destination.
 
@@ -130,7 +113,7 @@ class Gitlab(object):
 
         for a_path in artifact_path:
             try:
-                data = job.artifact(a_path)  # type: bytes
+                data = job.artifact(a_path)
             except gitlab.GitlabGetError as e:
                 print("Failed to download '{}' from job {}".format(a_path, job_id))
                 raise e
@@ -147,8 +130,7 @@ class Gitlab(object):
 
         return raw_data_list
 
-    @retry
-    def find_job_id(self, job_name, pipeline_id=None, job_status='success'):  # type: (str, Optional[str], str) -> List[Dict]
+    def find_job_id(self, job_name, pipeline_id=None, job_status='success'):
         """
         Get Job ID from job name of specific pipeline
 
@@ -170,8 +152,8 @@ class Gitlab(object):
                     job_id_list.append({'id': job.id, 'parallel_num': match.group(3)})
         return job_id_list
 
-    @retry
-    def download_archive(self, ref, destination, project_id=None):  # type: (str, str, Optional[int]) -> str
+    @retry_download
+    def download_archive(self, ref, destination, project_id=None):
         """
         Download archive of certain commit of a repository and extract to destination path
 
@@ -201,7 +183,7 @@ class Gitlab(object):
         return os.path.join(os.path.realpath(destination), root_name)
 
 
-def main():  # type: () -> None
+if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('action')
     parser.add_argument('project_id', type=int)
@@ -227,7 +209,3 @@ def main():  # type: () -> None
     elif args.action == 'get_project_id':
         ret = gitlab_inst.get_project_id(args.project_name)
         print('project id: {}'.format(ret))
-
-
-if __name__ == '__main__':
-    main()

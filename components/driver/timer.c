@@ -216,12 +216,8 @@ static void IRAM_ATTR timer_isr_default(void *arg)
             is_awoken = timer_obj->timer_isr_fun.fn(timer_obj->timer_isr_fun.args);
             //Clear intrrupt status
             timer_hal_clear_intr_status(&(timer_obj->hal));
-            //If the timer is set to auto reload, we need enable it again, so it is triggered the next time.
-            if (timer_hal_get_auto_reload(&timer_obj->hal)) {
-                timer_hal_set_alarm_enable(&(timer_obj->hal), TIMER_ALARM_EN);
-            } else {
-                timer_hal_set_alarm_enable(&(timer_obj->hal), TIMER_ALARM_DIS);
-            }
+            //After the alarm has been triggered, we need enable it again, so it is triggered the next time.
+            timer_hal_set_alarm_enable(&(timer_obj->hal), TIMER_ALARM_EN);
         }
     }
     TIMER_EXIT_CRITICAL(&timer_spinlock[timer_obj->timer_isr_fun.isr_timer_group]);
